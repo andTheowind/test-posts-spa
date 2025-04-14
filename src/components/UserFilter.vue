@@ -57,7 +57,7 @@ export default {
             <input type="text" class="form-control" placeholder="Введите имя автора..." v-model="inputValue"
                 @input="handleInputChange" @keyup.enter="triggerSearch" />
         </div>
-        <div class="suggestions mt-2" v-if="showSuggestions && filteredUsers.length">
+        <div class="suggestions" v-if="showSuggestions && filteredUsers.length">
             <div class="suggestion-item p-2 border-bottom" v-for="user in filteredUsers" :key="user.id"
                 @click="selectUser(user)">
                 {{ user.name }}
@@ -86,6 +86,7 @@ export default {
     border: 1px solid #ddd;
     border-radius: 4px;
     z-index: 1000;
+    margin-top: 2.4rem;
 }
 
 .suggestion-item {
