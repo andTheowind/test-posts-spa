@@ -36,19 +36,26 @@ export default {
     })
 
     const postsWithAuthors = computed(() => {
-      if (!posts.value.length || !users.value.length) return []
+      if (!posts.value.length || !users.value.length) return [];
+      let usersCache = {};
 
-      const usersMap = users.value.reduce((acc, user) => {
-        acc[user.id] = user
-        return acc
-      }, {})
+      return posts.value.reduce((result, post) => {
+        if (!usersCache[post.userId]) {
+          const user = users.value.find(u => u.id === post.userId);
+          usersCache[post.userId] = user || {
+            name: 'Неизвестный автор',
+            username: ''
+          };
+        }
+        result.push({
+          ...post,
+          authorName: usersCache[post.userId].name,
+          authorUsername: usersCache[post.userId].username
+        });
 
-      return posts.value.map(post => ({
-        ...post,
-        authorName: usersMap[post.userId]?.name || 'Неизвестный автор',
-        authorUsername: usersMap[post.userId]?.username || ''
-      }))
-    })
+        return result;
+      }, []);
+    });
 
     const filteredPosts = computed(() => {
       if (!searchQuery.value) return postsWithAuthors.value

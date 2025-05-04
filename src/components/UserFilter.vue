@@ -8,41 +8,40 @@ export default {
             required: true
         }
     },
+    emits: ['filter'],
     setup(props, { emit }) {
-        const inputValue = ref('')
+        const searchQuery = ref('')
         const showSuggestions = ref(false)
 
         const filteredUsers = computed(() => {
-            if (!inputValue.value) return []
-            const query = inputValue.value.toLowerCase()
+            if (!searchQuery.value) return []
+            const query = searchQuery.value.toLowerCase()
             return props.users.filter(user =>
                 user.name.toLowerCase().includes(query) ||
                 user.username.toLowerCase().includes(query)
             )
         })
 
-        const handleInputChange = () => {
-            showSuggestions.value = true
-            if (!inputValue.value) emit('filter', '')
-        }
-
         const triggerSearch = () => {
             showSuggestions.value = false
-            emit('filter', inputValue.value)
+            emit('filter', searchQuery.value)
         }
 
         const selectUser = (user) => {
-            inputValue.value = user.name
+            searchQuery.value = user.name
             triggerSearch()
+        }
+        const updateSearch = () => {
+            showSuggestions.value = !!searchQuery.value
         }
 
         return {
-            inputValue,
+            searchQuery,
             showSuggestions,
             filteredUsers,
-            handleInputChange,
             triggerSearch,
-            selectUser
+            selectUser,
+            updateSearch
         }
     }
 }
@@ -52,10 +51,10 @@ export default {
     <div class="user-filter">
         <div class="input-group">
             <button class="btn border-light" type="button" @click="triggerSearch">
-                <img src="./../assets/loupe-search.svg" class="img-fluid opacity-50" alt="">
+                <img src="./../assets/loupe-search.svg" class="img-fluid opacity-50" alt="Search">
             </button>
-            <input type="text" class="form-control" placeholder="Введите имя автора..." v-model="inputValue"
-                @input="handleInputChange" @keyup.enter="triggerSearch" />
+            <input type="text" class="form-control" placeholder="Введите имя автора..." v-model="searchQuery"
+                @input="updateSearch" @keyup.enter="triggerSearch" />
         </div>
         <div class="suggestions" v-if="showSuggestions && filteredUsers.length">
             <div class="suggestion-item p-2 border-bottom" v-for="user in filteredUsers" :key="user.id"
@@ -87,10 +86,10 @@ export default {
     border-radius: 4px;
     z-index: 1000;
     margin-top: 2.4rem;
-}
 
-.suggestion-item {
-    cursor: pointer;
+    .suggestion-item {
+        cursor: pointer;
+    }
 }
 
 .input-group {
